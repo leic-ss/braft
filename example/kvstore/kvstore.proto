@@ -1,0 +1,34 @@
+syntax="proto3";
+package example;
+
+option cc_generic_services = true;
+
+message GetRequest {
+    string group_id = 1;
+    string key = 2;
+    string value = 3;
+};
+
+message GetResponse {
+    bool success = 1;
+    string key = 2;
+    string value = 3;
+    string redirect = 4;
+};
+
+message PutRequest {
+    string group_id = 1;
+    string key = 2;
+    string value = 3;
+};
+
+message PutResponse {
+    bool success = 1;
+    int32 rc = 2;
+    string redirect = 3;
+};
+
+service KvStoreService {
+    rpc get(GetRequest) returns (GetResponse);
+    rpc put(PutRequest) returns (PutResponse);
+};
