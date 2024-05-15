@@ -52,9 +52,13 @@ butil::Status reset_peer(const GroupId& group_id, const PeerId& peer_id,
                          const Configuration& new_conf,
                          const CliOptions& options);
 
+butil::Status get_cluster(const GroupId& group_id, const PeerId& peer_id,
+                          const CliOptions& options);
+
 // Ask the peer to dump a snapshot immediately.
 butil::Status snapshot(const GroupId& group_id, const PeerId& peer_id,
                        const CliOptions& options);
+
 
 }  // namespace cli
 }  //  namespace braft

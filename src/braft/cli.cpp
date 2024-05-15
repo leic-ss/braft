@@ -173,6 +173,31 @@ butil::Status reset_peer(const GroupId& group_id, const PeerId& peer_id,
     return butil::Status::OK();
 }
 
+butil::Status get_cluster(const GroupId& group_id, const PeerId& peer_id,
+                          const CliOptions& options)
+{
+    brpc::Channel channel;
+    if (channel.Init(peer_id.addr, NULL) != 0) {
+        return butil::Status(-1, "Fail to init channel to %s",
+                                peer_id.to_string().c_str());
+    }
+    brpc::Controller cntl;
+    cntl.set_timeout_ms(options.timeout_ms);
+    cntl.set_max_retry(options.max_retry);
+    GetClusterRequest request;
+    request.set_group_id(group_id);
+    request.set_leader_id(peer_id.to_string());
+
+    GetClusterResponse response;
+    CliService_Stub stub(&channel);
+    stub.get_cluster(&cntl, &request, &response, NULL);
+    if (cntl.Failed()) {
+        return butil::Status(cntl.ErrorCode(), cntl.ErrorText());
+    }
+
+    return butil::Status::OK();
+}
+
 butil::Status snapshot(const GroupId& group_id, const PeerId& peer_id,
                       const CliOptions& options) {
     brpc::Channel channel;

@@ -247,6 +247,48 @@ int reset_peer()
     return 0;
 }
 
+int get_cluster()
+{
+    CHECK_FLAG(conf);
+    CHECK_FLAG(group);
+    Configuration conf;
+    if (conf.parse_from(FLAGS_conf) != 0) {
+        LOG(ERROR) << "Fail to parse --conf=`" << FLAGS_conf << '\'';
+        return -1;
+    }
+
+    PeerId leader_id;
+    butil::Status st = get_leader(FLAGS_group, conf, &leader_id);
+    if (!st.ok()) {
+        LOG(ERROR) << st.error_str();
+        return -1;
+    }
+    // BRAFT_RETURN_IF(!st.ok(), st);
+    brpc::Channel channel;
+    if (channel.Init(leader_id.addr, NULL) != 0) {
+        LOG(ERROR) << "Fail to init channel to " << leader_id.to_string().c_str();
+        return butil::Status(-1, "Fail to init channel to %s",
+                                leader_id.to_string().c_str()).error_code();
+    }
+
+    brpc::Controller cntl;
+    cntl.set_timeout_ms(FLAGS_timeout_ms);
+    cntl.set_max_retry(FLAGS_max_retry);
+    GetClusterRequest request;
+    request.set_group_id(FLAGS_group);
+    request.set_leader_id(leader_id.to_string());
+
+    GetClusterResponse response;
+    CliService_Stub stub(&channel);
+    stub.get_cluster(&cntl, &request, &response, NULL);
+    if (cntl.Failed()) {
+        return butil::Status(cntl.ErrorCode(), cntl.ErrorText()).error_code();
+    }
+
+    LOG(INFO) << "\n" << response.DebugString();
+    return 0;
+}
+
 int snapshot()
 {
     CHECK_FLAG(peer);
@@ -313,6 +355,9 @@ int run_command(const std::string& cmd)
     if (cmd == "transfer_leader") {
         return transfer_leader();
     }
+    if (cmd == "getcluster") {
+        return get_cluster();
+    }
     if (cmd == "put") {
         return do_put();
     }
@@ -349,6 +394,7 @@ int main(int argc , char* argv[])
                                      "--peer==$target_peer --new_peers=$new_peers\n"
                         "  snapshot --group=$group_id --peer=$target_peer\n"
                         "  transfer_leader --group=$group_id --peer=$target_leader --conf=$current_conf\n"
+                        "  getcluster   --group=$group_id --conf=$current_conf\n"
                         "  put     --group=$group_id --key=$key --value=$value --conf=$current_conf\n"
                         "  get     --group=$group_id --key=$key --conf=$current_conf\n",
                         proc_name);

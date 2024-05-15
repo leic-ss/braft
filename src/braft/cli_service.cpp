@@ -319,6 +319,33 @@ void CliServiceImpl::change_peers(::google::protobuf::RpcController* controller,
     return node->change_peers(conf, change_peers_done);
 }
 
+void CliServiceImpl::get_cluster(::google::protobuf::RpcController* controller,
+                                  const ::braft::GetClusterRequest* request,
+                                  ::braft::GetClusterResponse* response,
+                                  ::google::protobuf::Closure* done)
+{
+    brpc::Controller* cntl = (brpc::Controller*)controller;
+    brpc::ClosureGuard done_guard(done);
+    scoped_refptr<NodeImpl> node;
+    butil::Status st = get_node(&node, request->group_id(), request->leader_id());
+    if (!st.ok()) {
+        cntl->SetFailed(st.error_code(), "%s", st.error_cstr());
+        return;
+    }
+    std::vector<PeerId> peers;
+    st = node->list_peers(&peers);
+    if (!st.ok()) {
+        cntl->SetFailed(st.error_code(), "%s", st.error_cstr());
+        return;
+    }
+
+    LOG(INFO) << peers.size() << "\n";
+    for (auto& peer : peers) {
+        LOG(INFO) << peer.to_string() << "\n";
+        response->add_peers(peer.to_string());
+    }
+}
+
 void CliServiceImpl::transfer_leader(
                     ::google::protobuf::RpcController* controller,
                     const ::braft::TransferLeaderRequest* request,

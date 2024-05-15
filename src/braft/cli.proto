@@ -71,6 +71,15 @@ message GetLeaderResponse {
     required string leader_id = 1;
 }
 
+message GetClusterRequest {
+    required string group_id = 1;
+    required string leader_id = 2;
+}
+
+message GetClusterResponse {
+    repeated string peers = 1;
+}
+
 // service
 service CliService {
     rpc add_peer(AddPeerRequest) returns (AddPeerResponse);
@@ -79,5 +88,6 @@ service CliService {
     rpc reset_peer(ResetPeerRequest) returns (ResetPeerResponse);
     rpc snapshot(SnapshotRequest) returns (SnapshotResponse);
     rpc get_leader(GetLeaderRequest) returns (GetLeaderResponse);
+    rpc get_cluster(GetClusterRequest) returns (GetClusterResponse);
     rpc transfer_leader(TransferLeaderRequest) returns (TransferLeaderResponse);
 };

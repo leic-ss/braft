@@ -49,6 +49,10 @@ public:
                       const ::braft::ChangePeersRequest* request,
                       ::braft::ChangePeersResponse* response,
                       ::google::protobuf::Closure* done);
+    void get_cluster(::google::protobuf::RpcController* controller,
+                     const ::braft::GetClusterRequest* request,
+                     ::braft::GetClusterResponse* response,
+                     ::google::protobuf::Closure* done);
     void transfer_leader(::google::protobuf::RpcController* controller,
                          const ::braft::TransferLeaderRequest* request,
                          ::braft::TransferLeaderResponse* response,
