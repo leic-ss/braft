@@ -25,7 +25,7 @@
 #include <braft/storage.h>
 
 #include "kvstore.pb.h"
-\
+
 DEFINE_bool(allow_absent_key, false, "Cas succeeds if the key is absent while "
                                      " exptected value is exactly 0");
 DEFINE_bool(check_term, true, "Check if the leader changed to another term");
