@@ -12,6 +12,7 @@ execute_process(
 )
 
 set(CMAKE_PREFIX_PATH ${OUTPUT_PATH})
+message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
 
 include(FindThreads)
 include(FindProtobuf)
@@ -122,7 +123,7 @@ if ((NOT LEVELDB_INCLUDE_PATH) OR (NOT LEVELDB_LIB))
 endif()
 include_directories(${LEVELDB_INCLUDE_PATH})
 
-add_executable(server server.cc ${PROTO_SRC} ${PROTO_HEADER})
+add_executable(server server.cc kvstore.cc ${PROTO_SRC} ${PROTO_HEADER})
 add_executable(client client.cc ${PROTO_SRC} ${PROTO_HEADER})
 
 set(DYNAMIC_LIB

@@ -286,6 +286,7 @@ int get_cluster()
     }
 
     LOG(INFO) << "\n" << response.DebugString();
+    LOG(INFO) << "\n" << "leader: " << leader_id.to_string();
     return 0;
 }
 
