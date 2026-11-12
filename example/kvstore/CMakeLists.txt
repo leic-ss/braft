@@ -13,6 +13,10 @@ execute_process(
 
 set(CMAKE_PREFIX_PATH ${OUTPUT_PATH})
 message(STATUS "CMAKE_PREFIX_PATH: " ${CMAKE_PREFIX_PATH})
+message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/../../brpc_third_lib")
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 include(FindThreads)
 include(FindProtobuf)
